@@ -1,0 +1,370 @@
+/* GLOBAL STYLES */
+@import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;700&family=Courier+New&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Chivo Mono', monospace;
+    user-select: none;
+}
+
+body {
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden; 
+}
+
+/* --- INTRO SCREEN STYLES (Cinematic Zoom) --- */
+
+#intro-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.5s ease-out, opacity 1s ease-in;
+}
+#intro-screen.white-flash {
+    background-color: #fff; /* White cinematic flash */
+}
+#glowing-door {
+    width: 150px; /* Slightly wider for better detail */
+    height: 250px; /* Taller */
+    background: 
+        linear-gradient(to right, #222, #111, #222), /* Main door panel texture */
+        linear-gradient(to bottom, #333, #111, #333); /* Vertical plank lines (overlayed) */
+    background-size: 100% 100%, 20% 100%; 
+    background-blend-mode: overlay; 
+    border: 5px solid #0a0a0a; 
+    position: relative;
+    cursor: pointer;
+    transform: scale(0.2); 
+    opacity: 0; 
+    transition: transform 3s ease-out, opacity 1s ease-in; 
+    border-radius: 3px; 
+    box-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.2),  
+        0 0 40px rgba(255, 255, 255, 0.1),  
+        0 0 10px rgba(255, 255, 255, 0.8) inset, 
+        0 0 5px rgba(255, 255, 255, 0.5) inset; 
+    animation: door-glow 2s infinite alternate ease-in-out; 
+    overflow: hidden; 
+}
+
+/* New: Door Panel Details (Vertical Lines) */
+#glowing-door::before, #glowing-door::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 2px; 
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.08); 
+    z-index: 1;
+}
+#glowing-door::before {
+    left: 30%; 
+}
+#glowing-door::after {
+    right: 30%; 
+}
+
+/* Door Handle - More realistic, silver-grey */
+.door-handle {
+    position: absolute;
+    width: 15px;
+    height: 30px;
+    background-color: #aaa; 
+    border: 1px solid #777;
+    border-radius: 3px;
+    right: 25px; 
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5) inset;
+    z-index: 2;
+}
+.door-handle::before { 
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #ccc;
+    border-radius: 50%;
+    top: 50%;
+    left: -5px; 
+    transform: translateY(-50%);
+    box-shadow: 0 0 2px rgba(255, 255, 255, 0.5), 0 0 5px rgba(0, 0, 0, 0.5) inset;
+}
+
+@keyframes door-glow {
+    0% { 
+        box-shadow: 
+            0 0 15px rgba(255, 255, 255, 0.1),  
+            0 0 30px rgba(255, 255, 255, 0.05),  
+            0 0 8px rgba(255, 255, 255, 0.6) inset, 
+            0 0 3px rgba(255, 255, 255, 0.3) inset; 
+    }
+    100% { 
+        box-shadow: 
+            0 0 25px rgba(255, 255, 255, 0.3),  
+            0 0 50px rgba(255, 255, 255, 0.15),  
+            0 0 12px rgba(255, 255, 255, 0.9) inset, 
+            0 0 7px rgba(255, 255, 255, 0.7) inset; 
+    }
+}
+
+#tap-text {
+    margin-top: 30px;
+    font-size: 1.2em;
+    color: #aaa;
+    letter-spacing: 2px;
+    opacity: 0; 
+    transition: opacity 0.5s ease-in 2.5s;
+    /* Ensure ENTER text is clickable on top of the door */
+    z-index: 5;
+    position: relative;
+    cursor: pointer; 
+}
+#intro-screen.ready #tap-text {
+    opacity: 1;
+}
+
+/* --- TYPEWRITER SCREEN STYLES --- */
+
+#typewriter-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Default background color will be set by JS on transition */
+    background-color: #fff;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Courier New', Courier, monospace; 
+    padding: 20px;
+    text-align: center;
+}
+#typewriter-text {
+    font-size: 2em;
+    font-weight: 400;
+    margin-bottom: 30px;
+    white-space: pre-wrap;
+    /* Cursor blinking is managed by JS style updates, not CSS animation here */
+}
+
+/* NEW: CONTINUE BUTTON STYLE (White on Orange/Black) */
+#continue-bsdk {
+    margin-top: 40px;
+    padding: 10px 30px;
+    font-size: 1.5em;
+    background: none;
+    color: #fff; 
+    border: 3px solid #fff;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+/* DIFFUSION TRANSITION */
+#transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 1000; 
+}
+#transition-overlay::before {
+    content: '';
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    border-radius: 50%;
+    background-color: #000; 
+    transform: scale(0);
+}
+
+/* NEW: ORANGE DIFFUSION EXPANSION */
+.diffuse-expand-orange #transition-overlay::before {
+    background-color: #F86720; /* Orange color */
+    animation: diffuse-expand 1s cubic-bezier(0.5, 0, 0.5, 1) forwards;
+}
+
+/* EXISTING: BLACK DIFFUSION EXPANSION */
+.diffuse-expand-black #transition-overlay::before {
+    background-color: #000;
+    animation: diffuse-expand 1s cubic-bezier(0.5, 0, 0.5, 1) forwards;
+}
+
+@keyframes diffuse-expand {
+    0% { width: 0px; height: 0px; transform: scale(1); }
+    100% { width: 300vmax; height: 300vmax; transform: scale(1); }
+}
+
+/* --- LEVEL SELECT SCREEN STYLES (RETAINED) --- */
+
+#level-select {
+    width: 90%;
+    max-width: 800px;
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #1a1a1a;
+    border: 2px solid #555;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+#level-select h1 {
+    font-size: 3.5em;
+    color: #F86720; 
+    letter-spacing: 5px;
+    margin-bottom: 5px;
+}
+#level-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 20px;
+    margin-bottom: 40px;
+}
+.level-box {
+    padding: 15px 10px;
+    background-color: #2e2e2e;
+    border: 1px solid #444;
+    cursor: pointer;
+    transition: all 0.2s;
+    aspect-ratio: 1 / 1; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.level-box.unlocked {
+    background-color: #F86720;
+    color: #000;
+    font-weight: bold;
+    border-color: #fff;
+    box-shadow: 0 0 15px rgba(248, 103, 32, 0.8);
+}
+.level-box.unlocked:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 0 25px rgba(248, 103, 32, 1);
+}
+.level-box.locked {
+    background-color: #111;
+    border-color: #333;
+    color: #555;
+    cursor: not-allowed;
+}
+
+
+/* --- GAME SCREEN STYLES --- */
+
+#game-container {
+    width: 800px; 
+    height: 490px;
+    max-width: 95vw;
+    margin: 20px auto;
+    position: relative;
+}
+#game-canvas {
+    width: 100%;
+    height: 450px;
+    background-color: #F86720; /* Primary Game Background Color (ORANGE) */
+    border: 5px solid #36170D; 
+    position: relative;
+    overflow: hidden; 
+}
+#game-ui {
+    height: 40px;
+    width: 100%;
+    background-color: #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+    font-size: 0.9em;
+}
+
+/* Player Sprite */
+#player {
+    position: absolute;
+    width: 25px; 
+    height: 25px; 
+    background-color: #FF8C00; 
+    border-radius: 50%;
+    border: 1px solid #CC7000;
+    z-index: 10;
+    transition: transform 0.1s; 
+    transform-origin: center;
+}
+#player::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 15px;
+    background-color: #228B22; 
+    border-radius: 50% 0; 
+    transform: rotate(-30deg);
+    top: -5px; 
+    left: 15px; 
+    z-index: 11;
+}
+
+/* Game Blocks and Traps */
+.game-block {
+    position: absolute;
+    background-color: #000; /* FIXED: All standard platforms are BLACK */
+    border: none;
+    box-shadow: none;
+}
+.trap-block {
+    position: absolute;
+    background-color: #000; /* Black Traps */
+}
+.exit-door {
+    position: absolute;
+    background-color: #000; /* Black Exit Door */
+    border: 2px solid #fff;
+    z-index: 5;
+}
+/* SPECIAL MECHANICS */
+.rise-block {
+    background-color: #FF69B4; /* Pink (Distinction for Rising Block) */
+    transition: top 0.1s ease-out, height 0.1s ease-out; 
+}
+.pendulum-rope, .pendulum-ball {
+    background-color: #000; 
+}
+.spinner-block {
+    background-color: #000; /* Spinner platform is also black */
+}
+.pushable-box {
+    background-color: #000; /* Black Pushable Box */
+    border: 3px solid #fff;
+}
+.lift-block {
+    background-color: #000; /* Black Lift */
+}
+
+/* ... (Rest of CSS styles remain the same) ... */
+
+.hidden {
+    display: none !important;
+}
